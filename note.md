@@ -95,7 +95,6 @@ PC --> addrSelector:フェッチ
 MEM --> IR:フェッチ
 MEM --> INple:LD
 INple --> GRn:LD,ADD
-GRn --> MEM:ST
 GRn --> OUTple:LD1
 定数0 --> OUTple:LD0
 compar --> FR:実行
@@ -109,6 +108,7 @@ MEM --> AR:アドレス格納
 AR --> addrSelector:オペランド読み出し
 addrSelector --> MEM:アドレス
 INple --> compar
+ALU --> MEM:ST
 @enduml
 ```
 crystal --> PC:クロック立ち下\nがり毎に加算
@@ -171,8 +171,8 @@ FR --> PC:ロード可否
 |||sine|zero|refMEM|INple|addZERO|GRZERO|MEM|sum|バイナリ|
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 |LD(fromGR) ||0|0|0|1|1|1|0|14|2
-|LD(fromMEM)||0|0|1|0|x|1|0|18|4
-|ST         ||0|0|1|x|x|0|1|17|3
+|LD(fromMEM)||0|0|1|0|x|1|0|18|3
+|ST         ||0|0|1|x|1|0|1|21|4
 |JZE        ||0|1|0|x|x|0|0|32|5
 |JMI        ||1|0|0|x|x|0|0|64|6
 |NOP        ||0|0|0|x|x|0|0|0|0
