@@ -83,8 +83,14 @@ object COMple
 object decoder
 object ALU
 object 定数0
+object AWplex
 object AR
 object addrSelector
+object OR
+object OR2
+object NOT
+object AND
+object RST
 PC --> addrSelector:フェッチ
 MEM --> IR:フェッチ
 MEM --> INple:LD
@@ -93,9 +99,6 @@ GRn --> MEM:ST
 GRn --> OUTple:LD1
 定数0 --> OUTple:LD0
 compar --> FR:実行
-MEM --> COMple:実行
-GRn --> COMple:実行
-COMple --> compar
 MEM --> PC:JZE,JMI
 MEM --> RS:格納先レジスタ
 GRn --> OUTple:ADD1
@@ -105,6 +108,7 @@ OUTple --> ALU:LD,ADD
 MEM --> AR:アドレス格納
 AR --> addrSelector:オペランド読み出し
 addrSelector --> MEM:アドレス
+INple --> compar
 @enduml
 ```
 crystal --> PC:クロック立ち下\nがり毎に加算
@@ -130,10 +134,11 @@ object AWplex
 object AR
 object addrSelector
 object OR
+object OR2
 object NOT
 object AND
+object RST
 crystal --> SC:順序管理器
-
 crystal --> AND:クロック
 SC --> OR:3クロック目
 SC --> OR:4クロック目
@@ -142,20 +147,37 @@ NOT --> AND
 AND --> PC
 SC --> IR:1クロック目
 crystal --> IR:1クロック目立上が\nりでIR確定(フェッチ)
-RS --> decoder:GRのenable切り替え
+RS --> AWplex:GRのenable切り替え
 crystal --> RS:2クロック目立\n上がりで確定
 SC --> RS:2クロック目
 IR --> AWplex:（LDかADD）以外か
-decoder --> AWplex:enable信号
-AWplex --> GRn:enable信号か0
+AWplex --> decoder:enable信号
+decoder --> GRn:enable信号か0
 crystal --> GRn:クロック
 crystal --> MEM:クロック
-IR --> ALU:加算か転送か
+IR --> OUTple:加算か転送か
 IR --> INple:LDか
 IR --> MEM:STか
 crystal --> AR:3クロック目立ち\n上がりで確定
 SC --> AR:3クロック目
 SC --> addrSelector:4クロック目
-
+PC --> OR2:carry
+RST --> OR2:RST
+OR2 --> SC:SCリセット
+IR --> PC:JZE,JMI
+FR --> PC:ロード可否
 @enduml
 ```
+|||sine|zero|refMEM|INple|addZERO|GRZERO|MEM|sum|バイナリ|
+|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+|LD(fromGR) ||0|0|0|1|1|1|0|14|2
+|LD(fromMEM)||0|0|1|0|x|1|0|18|4
+|ST         ||0|0|1|x|x|0|1|17|3
+|JZE        ||0|1|0|x|x|0|0|32|5
+|JMI        ||1|0|0|x|x|0|0|64|6
+|NOP        ||0|0|0|x|x|0|0|0|0
+|ADD        ||0|0|0|1|0|1|0|10|1
+||
+|0の数      ||6|6||1|1|4|6|
+|1の数      ||1|1||2|1|3|1|
+|xの数      ||0|0||4|5|0|0|
