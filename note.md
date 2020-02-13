@@ -107,7 +107,7 @@ AR --> addrSelector:オペランド読み出し
 addrSelector --> MEM:アドレス
 @enduml
 ```
-
+crystal --> PC:クロック立ち下\nがり毎に加算
 #### 制御フロー
 ```plantuml
 @startuml
@@ -129,8 +129,17 @@ object 定数0
 object AWplex
 object AR
 object addrSelector
+object OR
+object NOT
+object AND
 crystal --> SC:順序管理器
-crystal --> PC:クロック立ち下\nがり毎に加算
+
+crystal --> AND:クロック
+SC --> OR:3クロック目
+SC --> OR:4クロック目
+OR --> NOT
+NOT --> AND
+AND --> PC
 SC --> IR:1クロック目
 crystal --> IR:1クロック目立上が\nりでIR確定(フェッチ)
 RS --> decoder:GRのenable切り替え
@@ -146,6 +155,7 @@ IR --> INple:LDか
 IR --> MEM:STか
 crystal --> AR:3クロック目立ち\n上がりで確定
 SC --> AR:3クロック目
-SC --> addrSelector:3クロック目
+SC --> addrSelector:4クロック目
+
 @enduml
 ```
